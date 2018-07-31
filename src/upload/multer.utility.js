@@ -2,7 +2,16 @@ const multer = require('multer');
 const multerAzure = require('multer-azure');
 const cloudinary = require('cloudinary');
 const cloudinaryStorage = require('multer-storage-cloudinary');
+const multerS3 = require('multer-s3');
+var AWS = require('aws-sdk');
 const config = require('../../config/default');
+
+AWS.config.update({
+  secretAccessKey: config.amazonS3.secretAccessKey,
+  accessKeyId: config.amazonS3.secretAccessKey.accessKeyId,
+  region: config.amazonS3.secretAccessKey.region
+});
+var s3 = new AWS.S3();
 
 cloudinary.config({
   cloud_name: config.cloudinary.cloud_name,
@@ -26,6 +35,20 @@ if(config.service == 'azure') {
       cloudinary: cloudinary,
       folder: config.storageFolder,
       allowedFormats: ['jpg', 'png', 'jpeg']
+    })
+  }).single('image');
+} else if(config.service === 'amazon') {
+  multerConfiguration = multer({
+    storage: multerS3({
+      s3: s3,
+      bucket: 'dallas-dev-test',
+      acl: 'public-read',
+      metadata: function (req, file, cb) {
+        cb(null, {fieldName: file.fieldname});
+      },
+      key: function (req, file, cb) {
+        cb(null, Date.now().toString() + '-' + file.originalname)
+      }
     })
   }).single('image');
 } else if(config.service == 'salesforce') {

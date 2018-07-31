@@ -2,37 +2,36 @@ var config = require('../../config/default');
 let request = require('request');
 var FormData = require('form-data');
 
-exports.upload = (req, res)=> {
-  if(!req.body.service_request_id) {
-    createExternalFile(req,res).then((result)=>{
-      postFileToChatter(req, res, result).then((result)=>{
-        createContentDist(result).then((result)=> {
-          const returnObj = {
-            filename: result.filename,
-            public_url: result.public_url,
-            format: result.format,
-            resourse_type: result.resourse_type,
-            content_version_id: result.content_version_id
-          }
-          res.status(200).send(returnObj);
-        });
-      });
-    });
-  } else if(req.body.service_request_id) {
-    postFileToChatter(req, res, req.body.service_request_id).then((result)=>{
-      createContentDist(result).then((result)=> {
-        createExternalFileAndLink(result).then((result) => {
-          const returnObj = {
-            filename: result.filename,
-            public_url: result.public_url,
-            format: result.format,
-            resourse_type: result.resourse_type,
-            content_version_id: result.content_version_id
-          }
-          res.status(200).send(returnObj);
-        });
-      });
-    });
+exports.upload = async (req, res)=> {
+  try {
+    if(!req.body.service_request_id) {
+        let createExternalFileResponse = await createExternalFile(req,res);
+        let postFileToChatterResponse = await postFileToChatter(req, res, createExternalFileResponse);
+        let finalResult = await createContentDist(postFileToChatterResponse);
+        const returnObj = {
+          filename: finalResult.filename,
+          public_url: finalResult.public_url,
+          format: finalResult.format,
+          resourse_type: finalResult.resourse_type,
+          content_version_id: finalResult.content_version_id
+        }
+        res.status(200).send(returnObj);
+    } else if(req.body.service_request_id) {
+      let result = await postFileToChatter(req, res, req.body.service_request_id);
+      let ccdResult = await createContentDist(result);
+      let finalResult = await createExternalFileAndLink(ccdResult);
+      const returnObj = {
+        filename: finalResult.filename,
+        public_url: finalResult.public_url,
+        format: finalResult.format,
+        resourse_type: finalResult.resourse_type,
+        content_version_id: finalResult.content_version_id
+      }
+      res.status(200).send(returnObj);
+    }
+  } catch (err) {
+    logger.error('Http error', err)
+    return res.status(500).send()
   }
 };
 

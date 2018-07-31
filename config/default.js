@@ -7,7 +7,7 @@ module.exports = {
     "query_url_ext": "/services/data/v41.0/query",
     "sobjects_url_ext": "/services/data/v41.0/sobjects",
     "x311_security_url_ext":"/services/apexrest/Incap311API/v3/security/",
-    "service":process.env.service || 'salesforce',
+    "service":process.env.service || 'amazon',
     "oauth": {
       "client_id": process.env.CLIENT_ID || '3MVG9ic.6IFhNpPqh4zZTisRJc6gmAamqCbuNuzjlgSrElcY9PW84c3TpBkQKAjHWzysXnrXsPgkJHWiPDmGN',
       "client_secret": process.env.CLIENT_SECRET || '3262948358926650311',
@@ -20,6 +20,11 @@ module.exports = {
       "account": process.env.AZURE_ACCOUNT || 'stoprodtxmgt',
       "key": process.env.AZURE_KEY || 'ZJrTyObUYVfOki5HdE+vXp3kS8t6jSteDhWQGwwfZCyQrAaM0fBmaHoOdAIirwYBQkSqLSyypF1uM6nF0MP1Sg==',
       "container": process.env.AZURE_CONTAINER || 'dallascrm-dev'
+    },
+    "amazonS3": {
+      "secretAccessKey": '2w/Rc1SbKOykdnvJX61D0WpBtZfI6+P2f6sbHqzx',
+      "accessKeyId": 'AKIAIGGDPUWZIPUYDOQQ',
+      "region": ''
     },
     "storageFolder" : 'dallas-dev',
     "cloudinary": {
