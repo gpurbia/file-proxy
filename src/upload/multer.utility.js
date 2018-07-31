@@ -29,10 +29,7 @@ if(config.service == 'azure') {
     })
   }).single('image');
 } else if(config.service == 'salesforce') {
-  console.log('calling============');
-  multerConfiguration = multer({
-    dest: __dirname + '../temp/',
-  }).single('image');
+  multerConfiguration = multer({storage: multer.memoryStorage()}).single('image');
 } else {
   multerConfiguration = multer({
     storage: multer.memoryStorage()

@@ -3,6 +3,8 @@ var express = require('express');
 var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
+var jsforce = require('jsforce');
+var config = require('./config/default');
 
 var app = express();
 
@@ -15,6 +17,28 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+// Fetch image upload service configuration from org.
+app.use((req, res, next) => {
+  var conn = new jsforce.Connection({
+    loginUrl : config.org_url
+  });
+  var records = [];
+  conn.login(config.oauth.username, config.oauth.password, function(err, userInfo) {
+    if (err) {
+      return console.error(err);
+    }
+    conn.query("select id,FileLInk__API_Key__c,FileLInk__Private_Key__c,FileLInk__Config_JSON__c,FileLInk__Service__c,FileLInk__URL__c  from FileLInk__File_Upload_Setting__mdt where FileLInk__Is_Default__c = true limit 1", (err, result) => {
+      if(err) {
+        res.status(500).send(err);
+      }
+      req.serviceConfig = result.records;
+      req.token = conn.accessToken;
+      // conn.logout();
+      next();
+    });
+  });
+});
 
 var indexRouter = require('./src/index');
 app.use('/', indexRouter);
