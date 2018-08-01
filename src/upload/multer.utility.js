@@ -8,8 +8,8 @@ const config = require('../../config/default');
 
 AWS.config.update({
   secretAccessKey: config.amazonS3.secretAccessKey,
-  accessKeyId: config.amazonS3.secretAccessKey.accessKeyId,
-  region: config.amazonS3.secretAccessKey.region
+  accessKeyId: config.amazonS3.accessKeyId,
+  region: config.amazonS3.region
 });
 var s3 = new AWS.S3();
 
@@ -33,8 +33,8 @@ if(config.service == 'azure') {
   multerConfiguration = multer({
     storage: cloudinaryStorage({
       cloudinary: cloudinary,
-      folder: config.storageFolder,
-      allowedFormats: ['jpg', 'png', 'jpeg']
+      folder: config.storageFolder
+      // allowedFormats: ['jpg', 'png', 'jpeg']
     })
   }).single('image');
 } else if(config.service === 'amazon') {
@@ -43,6 +43,7 @@ if(config.service == 'azure') {
       s3: s3,
       bucket: 'dallas-dev-test',
       acl: 'public-read',
+      contentType: multerS3.AUTO_CONTENT_TYPE,
       metadata: function (req, file, cb) {
         cb(null, {fieldName: file.fieldname});
       },

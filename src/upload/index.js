@@ -5,8 +5,6 @@ var amazonS3Api = require('./amazonS3');
 var salesforceAPI = require('./salesforce');
 
 exports.upload = (req, res) => {
-  console.log('============ req ==========', req.file);
-  console.log('============ req.body.fileData ==========', req.body.fileData);
   if(!req.file && !req.body.fileData) {
     res.status(500).send('No file detected!');
   } else if(req.file && config.service !== 'salesforce') {
@@ -16,7 +14,6 @@ exports.upload = (req, res) => {
   } else if(config.service == 'cloudinary' && req.body.fileData) {
     cloudinaryAPI.upload(req, res);
   } else if(config.service == 'amazon' && req.body.fileData) {
-    console.log('====== here ==============');
     amazonS3Api.upload(req, res);
   } else if(config.service == 'salesforce') {
     salesforceAPI.upload(req, res);

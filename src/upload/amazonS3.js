@@ -10,18 +10,17 @@ exports.upload = (req, res) => {
   const base64Data = new Buffer(req.body.fileData.replace(/^data:image\/\w+;base64,/, ""), 'base64');
   // Getting the file type, ie: jpeg, png or gif
   const type = req.body.fileData.split(';')[0].split('/')[1];
-  const userId = 1;
   const params = {
     Bucket: 'dallas-dev-test',
-    Key: `${userId}.${type}`, // type is not required
+    Key: Date.now().toString() + '-' + req.body.fileName,
     Body: base64Data,
     ACL: 'public-read',
-    ContentEncoding: 'base64', // required
-    ContentType: `image/${type}` // required. Notice the back ticks
+    ContentEncoding: 'base64',
+    ContentType: `image/${type}`
   }
   s3.upload(params, (err, data) => {
     if (err) {
-      return console.log(err);
+      res.status(500).send(err);
     }
     res.status(200).send(data);
   });
