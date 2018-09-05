@@ -1,3 +1,8 @@
+/*
+  Multer Utility
+  Configuration of Multer for different services.
+*/
+
 const multer = require('multer');
 const multerAzure = require('multer-azure');
 const cloudinary = require('cloudinary');
@@ -19,44 +24,56 @@ cloudinary.config({
   api_secret: config.cloudinary.api_secret
 });
 
-var multerConfiguration;
-if(config.service == 'azure') {
-  multerConfiguration = multer({
-    storage: multerAzure({
-      connectionString: config.azure.connectionString,
-      account: config.azure.account,
-      key: config.azure.key,
-      container: config.azure.container
-    })
-  }).single('image');
-} else if(config.service == 'cloudinary') {
-  multerConfiguration = multer({
-    storage: cloudinaryStorage({
-      cloudinary: cloudinary,
-      folder: config.storageFolder
-      // allowedFormats: ['jpg', 'png', 'jpeg']
-    })
-  }).single('image');
-} else if(config.service === 'amazon') {
-  multerConfiguration = multer({
-    storage: multerS3({
-      s3: s3,
-      bucket: 'dallas-dev-test',
-      acl: 'public-read',
-      contentType: multerS3.AUTO_CONTENT_TYPE,
-      metadata: function (req, file, cb) {
-        cb(null, {fieldName: file.fieldname});
-      },
-      key: function (req, file, cb) {
-        cb(null, Date.now().toString() + '-' + file.originalname)
-      }
-    })
-  }).single('image');
-} else if(config.service == 'salesforce') {
-  multerConfiguration = multer({storage: multer.memoryStorage()}).single('image');
-} else {
-  multerConfiguration = multer({
-    storage: multer.memoryStorage()
-  }).single('image');
+class MulterUtility {
+  constructor() {
+  }
+
+  getActiveMulterService() {
+    console.log('<========= Active Service Name========>: ' + global.serviceConfig.FileLInk__Service__c);
+    var multerConfiguration;
+    if(global.serviceConfig.FileLInk__Service__c == 'azure') {
+      multerConfiguration = multer({
+        storage: multerAzure({
+          connectionString: config.azure.connectionString,
+          account: config.azure.account,
+          key: config.azure.key,
+          container: config.azure.container
+        })
+      }).single('cFile');
+    } else if(global.serviceConfig.FileLInk__Service__c == 'cloudinary') {
+      multerConfiguration = multer({
+        storage: cloudinaryStorage({
+          cloudinary: cloudinary,
+          folder: config.storageFolder
+          // allowedFormats: ['jpg', 'png', 'jpeg']
+        })
+      }).single('cFile');
+    } else if(global.serviceConfig.FileLInk__Service__c === 'amazon') {
+      multerConfiguration = multer({
+        storage: multerS3({
+          s3: s3,
+          bucket: 'dallas-dev-test',
+          acl: 'public-read',
+          contentType: multerS3.AUTO_CONTENT_TYPE,
+          metadata: function (req, file, cb) {
+            cb(null, {fieldName: file.fieldname});
+          },
+          key: function (req, file, cb) {
+            cb(null, Date.now().toString() + '-' + file.originalname)
+          }
+        })
+      }).single('cFile');
+    } else if(global.serviceConfig.FileLInk__Service__c == 'Salesforce Files') {
+      multerConfiguration = multer({
+        storage: multer.memoryStorage()
+      }).single('cFile');
+    } else {
+      multerConfiguration = multer({
+        storage: multer.memoryStorage()
+      }).single('cFile');
+    }
+    return multerConfiguration;
+  }
 }
-exports.multerConfiguration = multerConfiguration;
+
+module.exports = MulterUtility;
