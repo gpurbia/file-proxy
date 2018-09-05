@@ -31,7 +31,7 @@ class MulterUtility {
   getActiveMulterService() {
     console.log('<========= Active Service Name========>: ' + global.serviceConfig.FileLInk__Service__c);
     var multerConfiguration;
-    if(global.serviceConfig.FileLInk__Service__c == 'azure') {
+    if(global.serviceConfig.FileLInk__Service__c === config.services.AZURE) {
       multerConfiguration = multer({
         storage: multerAzure({
           connectionString: config.azure.connectionString,
@@ -40,7 +40,7 @@ class MulterUtility {
           container: config.azure.container
         })
       }).single('cFile');
-    } else if(global.serviceConfig.FileLInk__Service__c == 'cloudinary') {
+    } else if(global.serviceConfig.FileLInk__Service__c === config.services.CLOUDINARY) {
       multerConfiguration = multer({
         storage: cloudinaryStorage({
           cloudinary: cloudinary,
@@ -48,7 +48,7 @@ class MulterUtility {
           // allowedFormats: ['jpg', 'png', 'jpeg']
         })
       }).single('cFile');
-    } else if(global.serviceConfig.FileLInk__Service__c === 'amazon') {
+    } else if(global.serviceConfig.FileLInk__Service__c === config.services.AMAZONS3) {
       multerConfiguration = multer({
         storage: multerS3({
           s3: s3,
@@ -63,7 +63,7 @@ class MulterUtility {
           }
         })
       }).single('cFile');
-    } else if(global.serviceConfig.FileLInk__Service__c == 'Salesforce Files') {
+    } else if(global.serviceConfig.FileLInk__Service__c === config.services.SALESFORCE) {
       multerConfiguration = multer({
         storage: multer.memoryStorage()
       }).single('cFile');

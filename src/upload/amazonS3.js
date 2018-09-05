@@ -56,7 +56,7 @@ const uploadFile = (req, res) => {
   // Getting the file type, ie: jpeg, png or gif
   const type = req.body.fileData.split(';')[0].split('/')[1];
   const params = {
-    Bucket: 'dallas-dev-test',
+    Bucket: config.storageFolder,
     Key: Date.now().toString() + '-' + req.body.fileName,
     Body: base64Data,
     ACL: 'public-read',
@@ -83,7 +83,7 @@ const uploadFileViaURL = (req, res) => {
       res.status(500).send(error);
     } else {
       s3.putObject({
-        Bucket: 'dallas-dev-test',
+        Bucket: config.storageFolder,
         key: Date.now().toString(),
         Body: body
       }, (err, data) => {
