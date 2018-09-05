@@ -1,7 +1,3 @@
-var config = require('../../config/default');
-let request = require('request');
-var FormData = require('form-data');
-
 var SalesforceUtility = require('./salesforceUtilities/salesforce.utility');
 
 exports.upload = async (req, res) => {
