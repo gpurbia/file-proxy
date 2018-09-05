@@ -21,14 +21,14 @@ module.exports = {
       "container": process.env.AZURE_CONTAINER
     },
     "amazonS3": {
-      "secretAccessKey": '',
-      "accessKeyId": '',
-      "region": ''
+      "secretAccessKey": process.env.S3_SECRET_ACCESS_KEY,
+      "accessKeyId": process.env.S3_ACCESS_KEY_ID,
+      "region": process.env.S3_REGION || ''
     },
     "storageFolder" : 'dallas-dev',
     "cloudinary": {
-      "cloud_name": '', 
-      "api_key": '', 
-      "api_secret": '' 
+      "cloud_name": process.env.CLOUDINARY_CLOUD_NAME, 
+      "api_key": process.env.CLOUDINARY_API_KEY,
+      "api_secret": process.env.CLOUDINARY_API_SECRET 
     }
 }
