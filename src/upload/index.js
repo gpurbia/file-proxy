@@ -7,8 +7,12 @@ var salesforceAPI = require('./salesforce');
 exports.upload = (req, res) => {
   console.log('<========== req.file ============>: ', req.file);
   console.log('<========== req.body ============>: ', req.body);
-  if(!req.file && !req.body.fileData) {
+
+  if(!global.serviceConfig.FileLInk__Service__c !== 'Salesforce Files' && !req.file && !req.body.fileData) {
     res.status(500).send('No file detected!');
+  }
+  else if(global.serviceConfig.FileLInk__Service__c == 'Salesforce Files' && !req.file && !req.body.content_version) {
+    res.status(400).send('No file detected. Please attach a file and re-submit.');
   }
   /* 
     If req.file comes in request, it will handle by multer configuration.

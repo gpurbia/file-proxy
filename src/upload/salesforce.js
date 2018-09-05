@@ -18,7 +18,7 @@ exports.upload = async (req, res) => {
         content_version_id: finalResult.content_version_id
       }
       res.status(200).send(returnObj);
-    } else if(req.file && req.body.service_request_id && !req.body.content_version) {
+    } else if(req.file && req.body.service_request_id) {
       let result = await SalesforceUtility.postFileToChatter(req, req.body.service_request_id);
       let ccdResult = await SalesforceUtility.createContentDist(result);
       let finalResult = await SalesforceUtility.createExternalFileAndLink(ccdResult);
@@ -32,7 +32,7 @@ exports.upload = async (req, res) => {
       res.status(200).send(returnObj);
     } else if (req.body.content_version && !req.body.service_request_id) {
       res.status(400).send('No service_request_id detected.');
-    } else if(req.file && req.body.service_request_id && req.body.content_version) {
+    } else if(!req.file && req.body.content_version) {
       var resultOut = {results : []};
       var result = await SalesforceUtility.retrieveServiceRequestId(req);
       req.body.content_version.forEach(async (value) => {
