@@ -152,7 +152,7 @@ class SalesforceUtility {
 
   createExternalFile(req) {
     return new Promise((resolve, reject) => {
-      
+      console.log('=========== Create External File ============ ', req.file);
       const options = {
         url: (config.org_url + config.sobjects_url_ext) + '/Filelink__External_File__c',
         headers: {
@@ -163,7 +163,7 @@ class SalesforceUtility {
           // "FileLInk__Public_URL__c": resultsJson.public_url,
           "FileLInk__Service__c": "Salesforce",
           "FileLink__Tags__c": "Create",
-          "FileLink__Mime_Type__c": req.file.mime_type
+          "FileLink__Mime_Type__c": req.file.mime_type || req.file.mimetype
         }
       }
       request.post(options, (err, resp, body) => {
@@ -241,11 +241,13 @@ class SalesforceUtility {
           "FileLInk__Filename__c": resultsJson.filename
         }
       }
+      // console.log('----> createExternalFileAndLink:Options[Query]: ' + JSON.stringify(options));
+      // console.log('----> createExternalFileAndLink:resultsJson: ' + JSON.stringify(resultsJson));
       request.post(options, (err, resp, body) => {
         const queryResultJson = body;
   
         if (!err && queryResultJson) {
-          console.log('----> FileLink External File created. Proceeding to create custom External Files Related Link record...');
+          // console.log('----> FileLink External File created. Proceeding to create custom External Files Related Link record...');
           const options = {
             url: (config.org_url + config.sobjects_url_ext) + '/Filelink__External_File_Relationship__c',
             headers: {
@@ -256,7 +258,8 @@ class SalesforceUtility {
               "FileLInk__External_File__c": queryResultJson.id,
             }
           }  
-  
+          
+          console.log('----> createExternalFileAndLink:resultsJson: ' + JSON.stringify(options));
           request.post(options, (err, resp, body) => {
             const queryResultJson = body;
             if (!err && queryResultJson) {

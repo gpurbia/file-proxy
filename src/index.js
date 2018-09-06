@@ -12,7 +12,6 @@ function getMetadataConfiguration(req, res, next) {
   var conn = new jsforce.Connection({
     loginUrl : config.org_url,
   });
-  var records = [];
   conn.login(config.oauth.username, config.oauth.password + 'ogjKwdb8lk8vCOv6fIgPcFA1k', (err) => {
     if (err) {
       return console.error(err);
