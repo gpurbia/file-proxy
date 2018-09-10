@@ -236,7 +236,7 @@ class SalesforceUtility {
           "FileLInk__External_ID__c": resultsJson.contentVersionId,
           "FileLInk__Public_URL__c": resultsJson.public_url,
           "FileLInk__Service__c": "Salesforce",
-          "FileLink__Tags__c": "Create",
+          "FileLink__Tags__c": resultsJson.tags,
           "FileLink__Mime_Type__c": resultsJson.mime_type,
           "FileLInk__Filename__c": resultsJson.filename
         }
@@ -256,6 +256,7 @@ class SalesforceUtility {
             json: {
               "FileLInk__Object_ID__c": resultsJson.srid,
               "FileLInk__External_File__c": queryResultJson.id,
+              "FileLink__Tags__c": resultsJson.tags,
             }
           }  
           
