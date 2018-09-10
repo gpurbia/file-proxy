@@ -2,24 +2,7 @@ var SalesforceUtility = require('./salesforceUtilities/salesforce.utility');
 
 exports.upload = async (req, res) => {
   try {
-    if(req.files && !req.body.service_request_id) {
-      var resArr = [];
-      for(var i = 0; i < req.files.length; i++) {
-        req.file = req.files[i];
-        let createExternalFileResponse = await SalesforceUtility.createExternalFile(req,res);
-        let postFileToChatterResponse = await SalesforceUtility.postFileToChatter(req, createExternalFileResponse);
-        let finalResult = await SalesforceUtility.createContentDist(postFileToChatterResponse);
-        const returnObj = {
-          filename: finalResult.filename,
-          public_url: finalResult.public_url,
-          format: finalResult.format,
-          resourse_type: finalResult.resourse_type,
-          content_version_id: finalResult.content_version_id
-        }
-        resArr.push(returnObj);
-      }
-      res.status(200).send(resArr);
-    } else if(req.files && req.body.service_request_id) {
+    if(req.files && req.body.service_request_id) {
       var resArr = [];
       for(var i = 0; i < req.files.length; i++) {
         req.file = req.files[i];

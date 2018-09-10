@@ -7,7 +7,6 @@ var SalesforceUtility = require('./salesforceUtilities/salesforce.utility');
 
 exports.upload = (req, res) => {
   console.log('<========== req.files ============>: ', req.files);
-  console.log('<========== req.file ============>: ', req.file);
   console.log('<========== req.body ============>: ', req.body);
   if (!req.body.api_key) {
     res.status(404).send('API Key not provided: Unable to create a file attachment');
@@ -24,8 +23,7 @@ exports.upload = (req, res) => {
   // else if(!SalesforceUtility.canUpload(req, res)) {
   //   res.status(400).send('API Key provided cannot upload');
   // }
-  SalesforceUtility.canUpload(req, res).then((result) => {
-    console.log('====== result =========', result);
+  SalesforceUtility.canUpload(req, res).then(() => {
     /* 
       If req.file comes in request, it will handle by multer configuration.
       Ignored in case of salesforce as we do not need to upload via multer in case of salesforce.
