@@ -39,7 +39,7 @@ class MulterUtility {
           key: config.azure.key,
           container: config.azure.container
         })
-      }).single('cFile');
+      }).array('cFile');
     } else if(global.serviceConfig.FileLInk__Service__c.toLowerCase().trim() === config.services.CLOUDINARY) {
       multerConfiguration = multer({
         storage: cloudinaryStorage({
@@ -47,7 +47,7 @@ class MulterUtility {
           folder: config.storageFolder
           // allowedFormats: ['jpg', 'png', 'jpeg']
         })
-      }).single('cFile');
+      }).array('cFile');
     } else if(global.serviceConfig.FileLInk__Service__c.toLowerCase().trim() === config.services.AMAZONS3) {
       multerConfiguration = multer({
         storage: multerS3({
@@ -62,15 +62,15 @@ class MulterUtility {
             cb(null, Date.now().toString() + '-' + file.originalname)
           }
         })
-      }).single('cFile');
+      }).array('cFile');
     } else if(global.serviceConfig.FileLInk__Service__c.toLowerCase().trim() === config.services.SALESFORCE) {
       multerConfiguration = multer({
         storage: multer.memoryStorage()
-      }).single('cFile');
+      }).array('cFile');
     } else {
       multerConfiguration = multer({
         storage: multer.memoryStorage()
-      }).single('cFile');
+      }).array('cFile');
     }
     return multerConfiguration;
   }

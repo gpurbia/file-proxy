@@ -2,33 +2,43 @@ var SalesforceUtility = require('./salesforceUtilities/salesforce.utility');
 
 exports.upload = async (req, res) => {
   try {
-    if(req.file && !req.body.service_request_id) {
-      let createExternalFileResponse = await SalesforceUtility.createExternalFile(req,res);
-      let postFileToChatterResponse = await SalesforceUtility.postFileToChatter(req, createExternalFileResponse);
-      let finalResult = await SalesforceUtility.createContentDist(postFileToChatterResponse);
-      const returnObj = {
-        filename: finalResult.filename,
-        public_url: finalResult.public_url,
-        format: finalResult.format,
-        resourse_type: finalResult.resourse_type,
-        content_version_id: finalResult.content_version_id
+    if(req.files && !req.body.service_request_id) {
+      var resArr = [];
+      for(var i = 0; i < req.files.length; i++) {
+        req.file = req.files[i];
+        let createExternalFileResponse = await SalesforceUtility.createExternalFile(req,res);
+        let postFileToChatterResponse = await SalesforceUtility.postFileToChatter(req, createExternalFileResponse);
+        let finalResult = await SalesforceUtility.createContentDist(postFileToChatterResponse);
+        const returnObj = {
+          filename: finalResult.filename,
+          public_url: finalResult.public_url,
+          format: finalResult.format,
+          resourse_type: finalResult.resourse_type,
+          content_version_id: finalResult.content_version_id
+        }
+        resArr.push(returnObj);
       }
-      res.status(200).send(returnObj);
-    } else if(req.file && req.body.service_request_id) {
-      let result = await SalesforceUtility.postFileToChatter(req, req.body.service_request_id);
-      let ccdResult = await SalesforceUtility.createContentDist(result);
-      let finalResult = await SalesforceUtility.createExternalFileAndLink(ccdResult);
-      const returnObj = {
-        filename: finalResult.filename,
-        public_url: finalResult.public_url,
-        format: finalResult.format,
-        resourse_type: finalResult.resourse_type,
-        content_version_id: finalResult.content_version_id
+      res.status(200).send(resArr);
+    } else if(req.files && req.body.service_request_id) {
+      var resArr = [];
+      for(var i = 0; i < req.files.length; i++) {
+        req.file = req.files[i];
+        let result = await SalesforceUtility.postFileToChatter(req, req.body.service_request_id);
+        let ccdResult = await SalesforceUtility.createContentDist(result);
+        let finalResult = await SalesforceUtility.createExternalFileAndLink(ccdResult);
+        const returnObj = {
+          filename: finalResult.filename,
+          public_url: finalResult.public_url,
+          format: finalResult.format,
+          resourse_type: finalResult.resourse_type,
+          content_version_id: finalResult.content_version_id
+        }
+        resArr.push(returnObj);
       }
-      res.status(200).send(returnObj);
+      res.status(200).send(resArr);
     } else if (req.body.content_version && !req.body.service_request_id) {
       res.status(400).send('No service_request_id detected.');
-    } else if(!req.file && req.body.content_version) {
+    } else if(!req.files && req.body.content_version) {
       var resultOut = {results : []};
       var result = await SalesforceUtility.retrieveServiceRequestId(req);
       req.body.content_version.forEach(async (value) => {

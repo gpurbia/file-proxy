@@ -16,14 +16,22 @@ exports.upload = async (req, res) => {
     uploadFile(req, res);
   } else if(req.body.fileUrl) {
     uploadFileViaURL(req, res);
-  } else if(req.file && !req.body.service_request_id) {
-    const returnObj = {
-      public_url: req.file.url,
-      format: req.file.mimetype,
-      filename:req.file.originalname
+  } else if(req.files && !req.body.service_request_id) {
+    var resArr = [];
+    for(var i = 0; i < req.files.length; i++) {
+      req.file = req.files[i];
+      const returnObj = {
+        public_url: req.file.url,
+        format: req.file.mimetype,
+        filename:req.file.originalname
+      }
+      resArr.push(returnObj);
     }
-    res.status(200).send(returnObj);
-  } else if(req.file && req.body.service_request_id && req.body.create_efr) {
+    res.status(200).send(resArr);
+  } else if(req.files && req.body.service_request_id && req.body.create_efr) {
+    var resArr = [];
+    for(var i = 0; i < req.files.length; i++) {
+      req.file = req.files[i];
       const resultJson = {
         public_url: req.file.url,
         mime_type: req.file.mimetype,
@@ -39,14 +47,21 @@ exports.upload = async (req, res) => {
         format: req.file.mimetype,
         filename:req.file.originalname
       }
-      res.status(200).send(returnObj);
-  } else {
-    const returnObj = {
-      public_url: req.file.url,
-      format: req.file.mimetype,
-      filename:req.file.originalname
+      resArr.push(returnObj);
     }
-    res.status(200).send(returnObj);
+    res.status(200).send(resArr);
+  } else {
+    var resArr = [];
+    for(var i = 0; i < req.files.length; i++) {
+      req.file = req.files[i];
+      const returnObj = {
+        public_url: req.file.url,
+        format: req.file.mimetype,
+        filename:req.file.originalname
+      }
+      resArr.push(returnObj);
+    }
+    res.status(200).send(resArr);
   }
 }
 
