@@ -12,6 +12,7 @@ exports.upload = async (req, res) => {
         const returnObj = {
           filename: finalResult.filename,
           public_url: finalResult.public_url,
+          mime_type: finalResult.mime_type,
           format: finalResult.format,
           resourse_type: finalResult.resourse_type,
           content_version_id: finalResult.content_version_id

@@ -31,9 +31,9 @@ exports.upload = async (req, res) => {
       };
       await SalesforceUtility.createExternalFileAndLink(resultJson);
       const returnObj = {
+        filename: req.file.originalname,
         public_url: req.file.url,
-        format: req.file.mimetype,
-        filename:req.file.originalname
+        mime_type: req.file.mimetype
       }
       resArr.push(returnObj);
     }
@@ -43,9 +43,9 @@ exports.upload = async (req, res) => {
     for(var i = 0; i < req.files.length; i++) {
       req.file = req.files[i];
       const returnObj = {
+        filename: req.file.originalname,
         public_url: req.file.url,
-        format: req.file.mimetype,
-        filename:req.file.originalname
+        mime_type: req.file.mimetype
       }
       resArr.push(returnObj);
     }
