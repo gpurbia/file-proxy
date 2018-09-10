@@ -264,7 +264,7 @@ class SalesforceUtility {
             const queryResultJson = body;
             if (!err && queryResultJson) {
               console.log('----> FileLink External File Relation created. Returning final object result to the user.');
-              resolve(resultsJson);    
+              resolve(resultsJson);
             } else {
               reject({ code: 400, message: 'An error occured when syncing the external file relations. Please try again later.' });
             }
@@ -272,6 +272,31 @@ class SalesforceUtility {
         } else {
           reject({ code: 400, message: 'An error occured when syncing the external files. Please try again later.' });
         } 
+      });
+    });
+  };
+
+  canUpload(req, res) {
+    return new Promise((resolve, reject) => {
+      const options = {
+        url: (config.org_url + config.x311_security_url_ext) + req.body.api_key.trim(),
+        headers: {
+          'Authorization': 'Bearer ' + (req.token),
+        }
+      }
+      console.log('----> Options[Query]: ' + JSON.stringify(options));
+      request.get(options, (err, resp, body) => {
+      try {
+        const queryResultJson = body ? JSON.parse(body) : null;
+        console.log("verifyAPIToken response: ", JSON.stringify(queryResultJson));
+        if(queryResultJson.can_upload){
+          resolve(true);
+        } else {
+         reject(false);
+        }
+      } catch(err) {
+        res.status(400).send('API Key provided is not valid');
+      }
       });
     });
   };

@@ -30,7 +30,8 @@ exports.upload = async (req, res) => {
         filename:req.file.originalname,
         srid: req.body.service_request_id,
         community_user_token: '',
-        tags: req.body.tags ? req.body.tags : 'Create'
+        tags: req.body.tags ? req.body.tags : 'Create',
+        token: req.token
       };
       await SalesforceUtility.createExternalFileAndLink(resultJson);
       const returnObj = {
