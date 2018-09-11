@@ -12,90 +12,105 @@ var s3 = new AWS.S3();
 
 
 exports.upload = async (req, res) => {
-  if(req.body.fileData) {
-    uploadFile(req, res);
-  } else if(req.body.fileUrl) {
-    uploadFileViaURL(req, res);
-  } else if(req.files && req.body.service_request_id && req.body.create_efr) {
-    var resArr = [];
-    for(var i = 0; i < req.files.length; i++) {
-      req.file = req.files[i];
+  try {
+    if(req.body.fileData) {
+      var result = await uploadFile(req, res);
       const resultJson = {
-        public_url: req.file.url,
-        mime_type: req.file.mimetype,
-        filename:req.file.originalname,
-        srid: req.body.service_request_id,
+        public_url: result.url,
+        mime_type: req.body.mimeType || '',
+        filename: req.body.FileName ||  req.body.fileName || '',
+        srid: req.body.service_request_id || '',
+        tags: req.body.description ? req.body.description : 'Create',
         community_user_token: '',
-        tags: req.body.tags ? req.body.tags : 'Create',
         token: req.token
       };
-      await SalesforceUtility.createExternalFileAndLink(resultJson);
+      await SalesforceUtility.createExternalFileAndLink(resultJson); // Link uploaded image to particular sObject.
       const returnObj = {
-        filename: req.file.originalname,
-        public_url: req.file.url,
-        mime_type: req.file.mimetype
+        filename: resultJson.filename,
+        public_url: resultJson.public_url,
+        mime_type: resultJson.mime_type
       }
-      resArr.push(returnObj);
-    }
-    res.status(200).send(resArr);
-  } else {
-    var resArr = [];
-    for(var i = 0; i < req.files.length; i++) {
-      req.file = req.files[i];
-      const returnObj = {
-        filename: req.file.originalname,
-        public_url: req.file.url,
-        mime_type: req.file.mimetype
+      res.status(200).send(returnObj);
+    } else if(req.body.fileUrl) {
+      uploadFileViaURL(req, res);
+    } else if(req.files && req.body.service_request_id && req.body.create_efr) {
+      var resArr = [];
+      for(var i = 0; i < req.files.length; i++) {
+        req.file = req.files[i];
+        const resultJson = {
+          public_url: req.file.url,
+          mime_type: req.file.mimetype,
+          filename:req.file.originalname,
+          srid: req.body.service_request_id,
+          community_user_token: '',
+          tags: req.body.tags ? req.body.tags : 'Create',
+          token: req.token
+        };
+        await SalesforceUtility.createExternalFileAndLink(resultJson);
+        const returnObj = {
+          filename: req.file.originalname,
+          public_url: req.file.url,
+          mime_type: req.file.mimetype
+        }
+        resArr.push(returnObj);
       }
-      resArr.push(returnObj);
+      res.status(200).send(resArr);
     }
-    res.status(200).send(resArr);
+  } catch(err) {
+    console.error(err);
+    res.status(400).send(err.message);
   }
 }
 
 
-// Upload file to amazons3 via Base64 string.
+// Upload file to s3 via Base64 string.
 const uploadFile = (req, res) => {
-  const base64Data = new Buffer(req.body.fileData.replace(/^data:image\/\w+;base64,/, ""), 'base64');
-  // Getting the file type, ie: jpeg, png or gif
-  const type = req.body.fileData.split(';')[0].split('/')[1];
-  const params = {
-    Bucket: config.storageFolder,
-    Key: Date.now().toString() + '-' + req.body.fileName,
-    Body: base64Data,
-    ACL: 'public-read',
-    ContentEncoding: 'base64',
-    ContentType: `image/${type}`
-  }
-  s3.putObject(params, (err, data) => {
-    if (err) {
-      res.status(500).send(err);
+  return new Promise((resolve, reject) => {
+    const base64Data = new Buffer(req.body.fileData.replace(/^data:image\/\w+;base64,/, ""), 'base64');
+    // Getting the file type, ie: jpeg, png or gif
+    const type = req.body.fileData.split(';')[0].split('/')[1];
+    const params = {
+      Bucket: config.storageFolder,
+      Key: Date.now().toString() + '-' + req.body.fileName,
+      Body: base64Data,
+      ACL: 'public-read',
+      ContentEncoding: 'base64',
+      ContentType: `image/${type}`
     }
-    res.status(200).send(data);
+    s3.putObject(params, (err, data) => {
+      if(err) {
+        console.error(err);
+        reject(err);
+      }
+      resolve(data);
+    });
   });
 };
 
 
-// Upload file to amazons3 via image url.
+// Upload file to s3 via image url.
 const uploadFileViaURL = (req, res) => {
-  var option = {
-    uri: req.body.fileUrl,
-    encoding: null
-  };
-  request(option, (error, response, body) => {
-    if(error || response.statusCode !== 200) {
-      res.status(500).send(error);
-    } else {
-      s3.putObject({
-        Bucket: config.storageFolder,
-        key: Date.now().toString(),
-        Body: body
-      }, (err, data) => {
-        if (err) {
-          res.status(500).send(err);
-        }
-        res.status(200).send(data);
-      });
-    }
+  return new Promise((resolve, reject) => {
+    var option = {
+      uri: req.body.fileUrl,
+      encoding: null
+    };
+    request(option, (error, response, body) => {
+      if(error || response.statusCode !== 200) {
+        reject(error);
+      } else {
+        s3.putObject({
+          Bucket: config.storageFolder,
+          key: Date.now().toString(),
+          Body: body
+        }, (err, data) => {
+          if (err) {
+            reject(error);
+          } else {
+            resolve(data);
+          }
+        });
+      }
+    });
   });
 }

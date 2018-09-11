@@ -150,33 +150,6 @@ class SalesforceUtility {
     });
   }
 
-  createExternalFile(req) {
-    return new Promise((resolve, reject) => {
-      console.log('=========== Create External File ============ ', req.file);
-      const options = {
-        url: (config.org_url + config.sobjects_url_ext) + '/Filelink__External_File__c',
-        headers: {
-          'Authorization': 'Bearer ' + req.token,
-        },
-        json: {
-           //"FileLInk__External_ID__c": resultsJson.contentVersionId,
-          // "FileLInk__Public_URL__c": resultsJson.public_url,
-          "FileLInk__Service__c": "Salesforce",
-          "FileLink__Tags__c": "Create",
-          "FileLink__Mime_Type__c": req.file.mime_type || req.file.mimetype
-        }
-      }
-      request.post(options, (err, resp, body) => {
-        const queryResultJson = body;
-        if (!err && queryResultJson) {
-          resolve(queryResultJson.id);    
-        } else {
-          reject({ code: 400, message: 'An error occured when syncing the external files. Please try again later.' });
-        } 
-      });
-    });
-  }
-
   createContentDist(resultsJson) {
     return new Promise((resolve, reject) => {
       const options = {
@@ -221,6 +194,33 @@ class SalesforceUtility {
         } else {
           reject({ code: 400, message: 'Unable to generate public facing url for distribution of file.' });
         }
+      });
+    });
+  }
+
+  createExternalFile(req) {
+    return new Promise((resolve, reject) => {
+      console.log('=========== Create External File ============ ', req.file);
+      const options = {
+        url: (config.org_url + config.sobjects_url_ext) + '/Filelink__External_File__c',
+        headers: {
+          'Authorization': 'Bearer ' + req.token,
+        },
+        json: {
+           //"FileLInk__External_ID__c": resultsJson.contentVersionId,
+          // "FileLInk__Public_URL__c": resultsJson.public_url,
+          "FileLInk__Service__c": "Salesforce",
+          "FileLink__Tags__c": "Create",
+          "FileLink__Mime_Type__c": req.file.mime_type || req.file.mimetype
+        }
+      }
+      request.post(options, (err, resp, body) => {
+        const queryResultJson = body;
+        if (!err && queryResultJson) {
+          resolve(queryResultJson.id);    
+        } else {
+          reject({ code: 400, message: 'An error occured when syncing the external files. Please try again later.' });
+        } 
       });
     });
   }
@@ -287,17 +287,17 @@ class SalesforceUtility {
       }
       console.log('----> Options[Query]: ' + JSON.stringify(options));
       request.get(options, (err, resp, body) => {
-      try {
-        const queryResultJson = body ? JSON.parse(body) : null;
-        console.log("verifyAPIToken response: ", JSON.stringify(queryResultJson));
-        if(queryResultJson.can_upload){
-          resolve(true);
-        } else {
-         reject(false);
+        try {
+          const queryResultJson = body ? JSON.parse(body) : null;
+          console.log("verifyAPIToken response: ", JSON.stringify(queryResultJson));
+          if(queryResultJson.can_upload){
+            resolve(true);
+          } else {
+            reject(false);
+          }
+        } catch(err) {
+          res.status(400).send('API Key provided is not valid');
         }
-      } catch(err) {
-        res.status(400).send('API Key provided is not valid');
-      }
       });
     });
   };

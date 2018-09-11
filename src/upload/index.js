@@ -24,9 +24,6 @@ exports.upload = (req, res) => {
     res.status(400).send('No file detected. Please attach a file and re-submit.');
     return;
   }
-  // else if(!SalesforceUtility.canUpload(req, res)) {
-  //   res.status(400).send('API Key provided cannot upload');
-  // }
   SalesforceUtility.canUpload(req, res).then(() => {
     /* 
       If req.file comes in request, it will handle by multer configuration.
@@ -49,6 +46,7 @@ exports.upload = (req, res) => {
       salesforceAPI.upload(req, res);
     }
   }, (err) => {
+    console.error(err);
     res.status(400).send('API Key provided cannot upload');
   });
 }
