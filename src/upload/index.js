@@ -16,11 +16,11 @@ exports.upload = (req, res) => {
     res.status(404).send('Service Request Id not provided: Unable to create a file attachment');
     return;
   }
-  else if(global.serviceConfig.FileLInk__Service__c.toLowerCase().trim() !== config.services.SALESFORCE && req.files.length <=0 && !req.body.fileData &&  !req.body.fileUrl) {
+  else if(global.serviceConfig.FileLInk__Service__c.toLowerCase().trim() !== config.services.SALESFORCE && req.files.length <=0 && !req.body.fileData && !req.body.fileUrl) {
     res.status(400).send('No file detected!');
     return;
   }
-  else if(global.serviceConfig.FileLInk__Service__c.toLowerCase().trim() == config.services.SALESFORCE && req.files.length <=0 && !req.body.content_version) {
+  else if(global.serviceConfig.FileLInk__Service__c.toLowerCase().trim() == config.services.SALESFORCE && req.files.length <=0 && !req.body.content_version && !req.body.fileUrl) {
     res.status(400).send('No file detected. Please attach a file and re-submit.');
     return;
   }

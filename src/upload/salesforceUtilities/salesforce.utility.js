@@ -92,7 +92,8 @@ class SalesforceUtility {
             "contentVersionId": contentVersionId,
             "mime_type": req.file.mimetype,
             "format" : body.capabilities.content.fileExtension,
-            "resourse_type": body.capabilities.content.fileType
+            "resourse_type": body.capabilities.content.fileType,
+            "tags": req.body.tags || 'Create'
           };
           resolve(resultsJson);
         } else {
