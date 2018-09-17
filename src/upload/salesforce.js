@@ -5,6 +5,9 @@ exports.upload = async (req, res) => {
   try {
     if(req.body.fileUrl && req.body.service_request_id) {
       imagetoBase64(req.body.fileUrl, async(err, data) => {
+        if(err) {
+          res.status(500).send(err);
+        }
         var buffer = new Buffer(data.base64, 'base64');
         var file = {
           buffer: buffer,
